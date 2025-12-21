@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/app/lib/prisma";
-import { type ProjectStatus, Prisma } from "@prisma/client";
+import { ProjectStatus, Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { generateProjectPlan } from "@/app/lib/agents/planning-agent";
