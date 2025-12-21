@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createProject } from "@/app/actions/projects";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export function CreateProjectForm({ workspaceId }: { workspaceId: string }) {
     const [name, setName] = useState("");
@@ -21,8 +22,12 @@ export function CreateProjectForm({ workspaceId }: { workspaceId: string }) {
                 goal,
             });
 
+            toast.success("Project created with AI plan!");
             // Redirect to new project
             router.push(`/workspace/${workspaceId}/project/${project.id}`);
+        } catch (error) {
+            console.error("Failed to create project:", error);
+            toast.error(error instanceof Error ? error.message : "Failed to create project");
         } finally {
             setLoading(false);
         }
