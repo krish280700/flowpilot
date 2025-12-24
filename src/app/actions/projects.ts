@@ -1,5 +1,4 @@
 "use server";
-export const runtime = "nodejs";
 
 import { prisma } from "@/app/lib/prisma";
 import { ProjectStatus, Prisma } from "@prisma/client";

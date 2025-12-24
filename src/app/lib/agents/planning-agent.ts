@@ -55,15 +55,15 @@ Return ONLY valid JSON (no extra text):
         content = content.replace(/```json/g, "").replace(/```/g, "").trim();
 
         const parsed = JSON.parse(content);
-
+        const normalized = normalizePlan(parsed)
         // Defensive check: Ensure epics is an array
-        if (!parsed.epics || !Array.isArray(parsed.epics)) {
-            console.error("AI returned malformed data: 'epics' is not an array", parsed);
+        if (!normalized.epics || !Array.isArray(normalized.epics)) {
+            console.error("AI returned malformed data: 'epics' is not an array", normalized);
             throw new Error("AI failed to generate a valid project structure (no epics found).");
         }
 
         // Save epics and tasks to database
-        for (const epic of parsed.epics) {
+        for (const epic of normalized.epics) {
             const createdEpic = await prisma.epic.create({
                 data: {
                     projectId,
@@ -93,9 +93,34 @@ Return ONLY valid JSON (no extra text):
             }
         }
 
-        return parsed;
+        return normalized;
     } catch (error) {
         console.error("Planning agent error:", error);
         throw error;
     }
+}
+
+function normalizePlan(parsed: any) {
+    if (!Array.isArray(parsed.epics)) return { epics: [] };
+
+    return {
+        epics: parsed.epics.map((epic: any) => ({
+            title: typeof epic.title === "string" ? epic.title : "Untitled Epic",
+            description: typeof epic.description === "string" ? epic.description : "",
+            tasks: Array.isArray(epic.tasks)
+                ? epic.tasks.map((task: any) => ({
+                    title: typeof task.title === "string" ? task.title : "Untitled Task",
+                    description: typeof task.description === "string" ? task.description : "",
+                    estimatedHours:
+                        typeof task.estimatedHours === "number"
+                            ? task.estimatedHours
+                            : parseInt(task.estimatedHours, 10) || null,
+                    priority:
+                        ["LOW", "MEDIUM", "HIGH"].includes(task.priority)
+                            ? task.priority
+                            : "MEDIUM",
+                }))
+                : [], // 🔑 GUARANTEE ARRAY
+        })),
+    };
 }
