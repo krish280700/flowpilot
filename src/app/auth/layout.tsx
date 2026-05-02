@@ -28,7 +28,7 @@ export default function AuthLayout({
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800">
+        <div className="min-h-screen bg-slate-950">
             {children}
         </div>
     );
