@@ -64,6 +64,7 @@ export function ProjectBoard({ projectId }: { projectId: string }) {
         IN_PROGRESS: [],
         IN_REVIEW: [],
         COMPLETED: [],
+        BLOCKED: [],
     });
     const [loading, setLoading] = useState(true);
     const [draggingOver, setDraggingOver] = useState<string | null>(null);
@@ -100,6 +101,7 @@ export function ProjectBoard({ projectId }: { projectId: string }) {
                 IN_PROGRESS: allTasks.filter((t) => t.status === "IN_PROGRESS"),
                 IN_REVIEW: allTasks.filter((t) => t.status === "IN_REVIEW"),
                 COMPLETED: allTasks.filter((t) => t.status === "COMPLETED"),
+                BLOCKED: allTasks.filter((t) => t.status === "BLOCKED"),
             });
         } finally {
             setLoading(false);

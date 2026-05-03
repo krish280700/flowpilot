@@ -4,7 +4,7 @@ import { prisma } from "@/app/lib/prisma";
 import { ProjectStatus, Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { generateProjectPlan } from "@/app/lib/agents/planning-agent";
+import { orchestrateProject } from "@/app/lib/agents/orchestrator";
 import { redirect } from "next/navigation";
 
 // Create new project + trigger AI planning
@@ -38,15 +38,12 @@ export async function createProject(data: {
         },
     });
 
-    // Trigger AI to break down goal into tasks
+    // Run the full multi-agent orchestration pipeline
     try {
-        await generateProjectPlan({
-            projectGoal: data.goal,
-            projectId: project.id,
-        });
+        await orchestrateProject(project.id, data.goal);
     } catch (error) {
-        console.error("AI planning failed:", error);
-        throw new Error(error instanceof Error ? error.message : "AI planning failed");
+        console.error("AI orchestration failed:", error);
+        throw new Error(error instanceof Error ? error.message : "AI orchestration failed");
     }
 
     return project;

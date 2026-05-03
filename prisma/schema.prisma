@@ -55,6 +55,7 @@ model Project {
   workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   sprints     Sprint[]
   tasks       Task[]
+  agentLogs   AgentLog[]
 }
 
 model Epic {
@@ -155,6 +156,23 @@ model Risk {
   task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
+model AgentLog {
+  id          String      @id @default(cuid())
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  agentName   String
+  agentRole   String
+  status      AgentStatus @default(PENDING)
+  input       String?     @db.Text
+  output      String?     @db.Text
+  score       Float?
+  durationMs  Int?
+  tokensUsed  Int?
+  error       String?
+  createdAt   DateTime    @default(now())
+  completedAt DateTime?
+}
+
 model GitHubIntegration {
   id            String   @id @default(cuid())
   workspaceId   String
@@ -230,4 +248,12 @@ enum Severity {
   MEDIUM
   HIGH
   CRITICAL
+}
+
+enum AgentStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  SKIPPED
 }
